@@ -125,9 +125,8 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa)
     ssize_t read_file, write_file;
     student_t temp_student;
 
-    off_t offset = id * sizeof(student_t);
 
-    if (lseek(fd, offset, SEEK_SET) == -1) {
+    if (lseek(fd, id * sizeof(student_t), SEEK_SET) == -1) {
         printf(M_ERR_DB_READ);
         return ERR_DB_FILE;
     }
@@ -154,7 +153,7 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa)
     temp_student.lname[sizeof(temp_student.lname) - 1] = '\0';
 
 
-    if (lseek(fd, offset, SEEK_SET) == -1) {
+    if (lseek(fd, id * sizeof(student_t), SEEK_SET) == -1) {
         printf(M_ERR_DB_READ);
         return ERR_DB_FILE;
     }
@@ -206,8 +205,7 @@ int del_student(int fd, int id)
         return ERR_DB_FILE;
     }
 
-        off_t offset = id * sizeof(student_t);
-    if (lseek(fd, offset, SEEK_SET) == -1) {
+    if (lseek(fd, id * sizeof(student_t), SEEK_SET) == -1) {
         printf(M_ERR_DB_READ);
         return ERR_DB_FILE;
     }
