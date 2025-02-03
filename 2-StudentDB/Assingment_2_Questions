@@ -1,0 +1,11 @@
+1. I thought that making get_student function did improve the overall design of the database because it was easy to manage, and I could reuse it in other parts of my code. For example, in the del_student function that told me to use my get_student function, I decided to search for the student. When I didnt find a student, it would return an error because you cannot delete a student that doesnt exist.
+
+2. The reason the implementation above may be a bad idea because it returns a local variable back to wherever the data is needed. In the scope of coding, local variables are normally released after the function is finished. Thus, later uses of this code may run into errors. For example, a bug where if you use the function one it may work. However, if you run this function twice, you would override the original memory address and lose previous information.
+
+3. This implementation would work even after the function is finished because it is returning a memory location. However, this could lead to problems if 1. memory managemet is correctly handled, so you would have to be more careful when coding.
+
+4. The ls command returns the total size of the data written to the file. Because each of the student records is 64ytes, each time we add an ID we add 64 bytes. Thus when we add ID=3 or ID=64, we will get the ID number * 64 bytes (per student record).
+
+4b. Files are usually given the minimal amount of memory. As discussed in class, we don't always just give out the amount asked because it may not be used. This is similar, where the total storage used on the disk is remained unchanged until we add ID=64, which is where we go past the 4K bytes mark. Thus, the disk needs to allocate another 4K block.
+
+4c. The reason the raw storage only increased a little bit is because there is a lot of data places not being used. The system will see this and use a sparse file system and not add actual storage to these unused bytes. Thus, ls will show the amount of local or theoretical value the file needs, while also showing the physical amount of storage it actually gave.  
