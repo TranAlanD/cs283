@@ -1,0 +1,41 @@
+1. Can you think of why we use `fork/execvp` instead of just calling `execvp` directly? What value do you think the `fork` provides?
+
+    > **Answer**:  _I believe that we use fork/execvp instead of calling exec directly because fork creates a new process and then exec replaces that process. This does run separately from the parent. However, if we only use exec, it would replace the entire current process with a new one._
+
+2. What happens if the fork() system call fails? How does your implementation handle this scenario?
+
+    > **Answer**:  _f the fork() system call fails that means we failed to make a duplicate process. The program I made deals with this by checking if fork returned a negative process id, which means it failed._
+
+3. How does execvp() find the command to execute? What system environment variable plays a role in this process?
+
+    > **Answer**:  _The execvp() command finds the command to execute by searching through directories, using the path environment variable. If it finds it, replaces the process that was forked with a new one. If not, it returns an error._
+
+4. What is the purpose of calling wait() in the parent process after forking? What would happen if we didn’t call it?
+
+    > **Answer**:  _We call wait to make sure the child is done before terminating the process. Otherwise, we would have an orphaned child and another "higher up" process will take it in. Also, if the parent depended on the child, we can make sure the parent process waits for the child to finish._
+
+5. In the referenced demo code we used WEXITSTATUS(). What information does this provide, and why is it important?
+
+    > **Answer**:  _WEEXITSTATUS provides the exit status of a child process. In this case, we know if the child finished the process or had an error along the way. This is very helpful in cases where the code fails and we need to debug it._
+
+6. Describe how your implementation of build_cmd_buff() handles quoted arguments. Why is this necessary?
+
+    > **Answer**:  _My build_cmd_buff() function handles quoted arguments by checking if there is a quote character in the command. If a quote is detected, the in_quote status is set to true, and the pointer iterates through the command string until it finds the end of the string ('\0') or another quote character. When the closing quote is found, the entire quoted string is treated as a single argument and added to the argv array._
+
+7. What changes did you make to your parsing logic compared to the previous assignment? Were there any unexpected challenges in refactoring your old code?
+
+    > **Answer**:  _A lot of changes were made to my parsing logic compared to the previous assignment. One of the major changes was that I had a lot of variables to check for the length of the command, pipes, and other things that separated the commands. However, in this one, because we had cmd_buff struct with variables, I was able to shorten my code to about half. One of the problems that I had while refactoring my code was trying to merge it in with my previous code. However, because of the struct cmd_buff, I decided to delete it and rebuild it because most of the variables that I had before to keep different lengths were pointless._
+
+8. For this quesiton, you need to do some research on Linux signals. You can use [this google search](https://www.google.com/search?q=Linux+signals+overview+site%3Aman7.org+OR+site%3Alinux.die.net+OR+site%3Atldp.org&oq=Linux+signals+overview+site%3Aman7.org+OR+site%3Alinux.die.net+OR+site%3Atldp.org&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBBzc2MGowajeoAgCwAgA&sourceid=chrome&ie=UTF-8) to get started.
+
+- What is the purpose of signals in a Linux system, and how do they differ from other forms of interprocess communication (IPC)?
+
+    > **Answer**:  _Linux signals are used to notify a process that an event has occurred, usually to handle errors or terminate processes. They differ fromm other forms of IPC because they can interrupt any process and are asynchronous._
+
+- Find and describe three commonly used signals (e.g., SIGKILL, SIGTERM, SIGINT). What are their typical use cases?
+
+    > **Answer**:  _SIGINT is used to clean up and then terminate a process through the user's signal. SIGTERM requests to terminate, while SIGKILL forcefully terminates a process with no clean up._
+
+- What happens when a process receives SIGSTOP? Can it be caught or ignored like SIGINT? Why or why not?
+
+    > **Answer**:  _When a process recieves SIGSTOP it immediately stops a process by the OS. This cannot be caught or ignored because people wanted a proper way to stop a process (discussed in class)._
