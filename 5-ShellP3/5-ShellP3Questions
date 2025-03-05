@@ -1,0 +1,15 @@
+1. Your shell forks multiple child processes when executing piped commands. How does your implementation ensure that all child processes complete before the shell continues accepting user input? What would happen if you forgot to call waitpid() on all child processes?
+
+_My shell uses waitpid() to make sure the child processes finish before accepting more user input. If I did forget to have this, the parent shell would execute immediately after forking, making teh shell to prompt for a new input before the command is finished. In the worse case, commands may overlap one another._
+
+2. The dup2() function is used to redirect input and output file descriptors. Explain why it is necessary to close unused pipe ends after calling dup2(). What could go wrong if you leave pipes open?
+
+_It is necessary to close pipes because we want to make sure there aren't things that can effect the code later. This is because the previous file descriptors are left open, which may conflict with other names in the future, leading to weird bugs. Moreover, it's a waste of resources because the program has things that it doesn't need open._
+
+3. Your shell recognizes built-in commands (cd, exit, dragon). Unlike external commands, built-in commands do not require execvp(). Why is cd implemented as a built-in rather than an external command? What challenges would arise if cd were implemented as an external process?
+
+_Cd is a built in command that allows for chaning between directories from parent to child processes, allowing the modification in different directories. If the cd were an external command, the changes would be lost because cd would be a child process, and would lose the progress when it's terminated._
+
+4. Currently, your shell supports a fixed number of piped commands (CMD_MAX). How would you modify your implementation to allow an arbitrary number of piped commands while still handling memory allocation efficiently? What trade-offs would you need to consider?
+
+_The change I would make is making an array that's dynamically sized whenever it's about to be full. In this case, the size of the memory given to the array would be double, allowing for the increase of piped commands. The tradeoff would definitely be memory usage because doubling the size of an array would mean making an entirely new, bigger array and copying the contents over. Moreover, if this is implemented incorrectly, my code may break or get a segmentation error._
