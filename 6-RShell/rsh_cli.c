@@ -1,3 +1,4 @@
+
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -99,12 +100,11 @@ int exec_remote_cmd_loop(char *address, int port)
 
     // TODO set up cmd and response buffs
     cmd_buff = (char *)malloc(SH_CMD_MAX * sizeof(char));
-    if (cmd_buff == NULL){
+    if (cmd_buff == NULL) {
         return ERR_MEMORY;
     }
     rsp_buff = (char *)malloc(SH_CMD_MAX * sizeof(char));
-    if (rsp_buff == NULL){
-        free(cmd_buff);
+    if (rsp_buff == NULL) {
         return ERR_MEMORY;
     }
 
@@ -118,14 +118,12 @@ int exec_remote_cmd_loop(char *address, int port)
     {
         // TODO print prompt
         printf("%s", SH_PROMPT);
-        
-	// TODO fgets input
+
+        // TODO fgets input
         if (fgets(cmd_buff, SH_CMD_MAX, stdin) == NULL) {
             printf("\n");
             break;
         }
-
-        cmd_buff[strcspn(cmd_buff, "\n")] = '\0';
 
         // TODO send() over cli_socket
         if (send(cli_socket, cmd_buff, strlen(cmd_buff) + 1, 0) < 0) {
@@ -152,11 +150,12 @@ int exec_remote_cmd_loop(char *address, int port)
                 break;
             }
         }
+
         // TODO break on exit command
         if (strcmp(cmd_buff, "exit") == 0) {
             break;
-        }    
-    
+        }
+
     }
 
     return client_cleanup(cli_socket, cmd_buff, rsp_buff, OK);
@@ -189,29 +188,39 @@ int start_client(char *server_ip, int port){
     struct sockaddr_in addr;
     int cli_socket;
     int ret;
-
+    
+    //printf("DEBUG: Starting client setup...\n"); // DEBUG
+    
     // TODO set up cli_socket
+    //printf("DEBUG: Creating socket...\n"); // DEBUG
+
     cli_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (cli_socket < 0) {
         perror("socket");
         return ERR_RDSH_CLIENT;
     }
+    //printf("DEBUG: Socket created successfully\n"); // DEBUG
 
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
+    //printf("DEBUG: Converting server IP: %s to binary format...\n", server_ip); // DEBUG
+
     if (inet_pton(AF_INET, server_ip, &addr.sin_addr) <= 0) {
         perror("inet_pton");
         close(cli_socket);
         return ERR_RDSH_CLIENT;
     }
+    //printf("DEBUG: Server IP success\n"); // DEBUG
 
+    //printf("DEBUG: Attempting to connect to server at %s:%d...\n", server_ip, port); //DEBUG
     ret = connect(cli_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (ret < 0) {
         perror("connect");
         close(cli_socket);
         return ERR_RDSH_CLIENT;
     }
+    //printf("DEBUG: Connected to server at %s:%d\n", server_ip, port); // DEBUG
 
     return cli_socket;
 }
@@ -253,4 +262,3 @@ int client_cleanup(int cli_socket, char *cmd_buff, char *rsp_buff, int rc){
     //Echo the return value that was passed as a parameter
     return rc;
 }
-
