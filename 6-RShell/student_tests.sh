@@ -263,7 +263,36 @@ EOF
     stop_server
 }
 
+#DEBUG TESTS
 
+@test "process_cli_requests - single client connection" {
+    start_server
+
+    run ./dsh -c -i 127.0.0.1 -p 1458 <<EOF
+echo "test command"
+EOF
+
+    echo "Server response: $output"
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"test command"* ]]  # Ensure the command was echoed back
+
+    stop_server
+}
+
+@test "send_message_eof - command termination" {
+    start_server
+
+    run ./dsh -c -i 127.0.0.1 -p 1234 <<EOF
+echo "done"
+EOF
+
+    echo "Output: $output"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"$RDSH_EOF_CHAR"* ]]
+
+    stop_server
+}
 
 
 
